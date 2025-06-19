@@ -10,7 +10,9 @@ require 'sinatra/cross_origin'
 configure do
   enable :cross_origin
 end
-
+# ✅ Required for Render deployment
+set :port, ENV['PORT'] || 4567
+set :bind, '0.0.0.0'
 before do
   response.headers['Access-Control-Allow-Origin'] = '*'
 end
