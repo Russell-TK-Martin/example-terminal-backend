@@ -141,3 +141,25 @@ post '/cancel_payment_intent' do
   end
 end
 
+# ✅ Update receipt email on an existing PaymentIntent
+post '/update_payment_intent' do
+  puts ">> /update_payment_intent called"
+  begin
+    id = params["payment_intent_id"]
+    email = params["receipt_email"]
+
+    payment_intent = Stripe::PaymentIntent.update(
+      id,
+      receipt_email: email
+    )
+
+    log_info("Updated PaymentIntent #{id} with receipt_email: #{email}")
+    status 200
+    return { success: true }.to_json
+
+  rescue Stripe::StripeError => e
+    status 402
+    return log_info("Update failed: #{e.message}")
+  end
+end
+
