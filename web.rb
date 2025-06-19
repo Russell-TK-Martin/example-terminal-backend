@@ -87,7 +87,7 @@ post '/create_payment_intent' do
       payment_method_types: params[:payment_method_types] || ['card_present'],
       capture_method: 'automatic',
       amount: params[:amount],
-      currency: params[:currency] || 'usd',
+      currency: params[:currency] || 'eur',
       description: params[:description] || 'Example PaymentIntent',
       payment_method_options: params[:payment_method_options] || {},
       receipt_email: params[:receipt_email]
