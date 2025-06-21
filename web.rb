@@ -76,6 +76,9 @@ end
 # ✅ Create payment intent
 post '/create_payment_intent' do
   puts ">> /create_payment_intent called"
+  puts ">>> Incoming params: #{params.inspect}"
+  puts ">>> Creating PaymentIntent with: capture_method = 'automatic', amount = #{params[:amount]}, currency = #{params[:currency]}"
+
   validationError = validateApiKey
   if validationError
     status 400
@@ -140,4 +143,3 @@ post '/cancel_payment_intent' do
     return log_info("Cancel failed: #{e.message}")
   end
 end
-
