@@ -76,6 +76,7 @@ end
 # ✅ Create payment intent (forced capture_method & currency)
 post '/create_payment_intent' do
   puts ">> /create_payment_intent called"
+  puts ">>> DEBUG: capture_method set to 'automatic'"
   puts ">>> Incoming params: #{params.inspect}"
   puts ">>> Creating PaymentIntent with: capture_method = 'automatic', amount = #{params[:amount]}, currency = 'eur'"
 
