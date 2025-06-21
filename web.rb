@@ -73,11 +73,11 @@ post '/connection_token' do
   end
 end
 
-# ✅ Create payment intent
+# ✅ Create payment intent (forced capture_method & currency)
 post '/create_payment_intent' do
   puts ">> /create_payment_intent called"
   puts ">>> Incoming params: #{params.inspect}"
-  puts ">>> Creating PaymentIntent with: capture_method = 'automatic', amount = #{params[:amount]}, currency = #{params[:currency]}"
+  puts ">>> Creating PaymentIntent with: capture_method = 'automatic', amount = #{params[:amount]}, currency = 'eur'"
 
   validationError = validateApiKey
   if validationError
@@ -87,12 +87,11 @@ post '/create_payment_intent' do
 
   begin
     payment_intent = Stripe::PaymentIntent.create(
-      payment_method_types: params[:payment_method_types] || ['card_present'],
+      payment_method_types: ['card_present'],
       capture_method: 'automatic',
       amount: params[:amount],
-      currency: params[:currency] || 'eur',
-      description: params[:description] || 'Example PaymentIntent',
-      payment_method_options: params[:payment_method_options] || {},
+      currency: 'eur',
+      description: params[:description] || 'Terminal Transaction',
       receipt_email: params[:receipt_email]
     )
 
