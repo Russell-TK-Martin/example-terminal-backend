@@ -7,5 +7,5 @@ services:
     buildCommand: bundle install
     startCommand: bundle exec ruby web.rb
     envVars:
-      - key: STRIPE_TEST_SECRET_KEY
+      - key: STRIPE_SECRET_KEY
         sync: false # placeholder for a value to be added in the dashboard
