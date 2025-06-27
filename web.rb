@@ -26,14 +26,21 @@ options "*" do
   200
 end
 
-# --- Stripe Key Setup ---
+# --- Load Environment Variables ---
 Dotenv.load
+
+# --- Logging: Print key status for debug ---
+puts ">> ENV['STRIPE_ENV']: #{ENV['STRIPE_ENV'] || '(not set)'}"
+puts ">> ENV['STRIPE_TEST_SECRET_KEY']: #{ENV['STRIPE_TEST_SECRET_KEY'] ? '[loaded]' : '(empty)'}"
+puts ">> ENV['STRIPE_SECRET_KEY']: #{ENV['STRIPE_SECRET_KEY'] ? '[loaded]' : '(empty)'}"
+
+# --- Stripe Setup ---
 Stripe.api_key = ENV['STRIPE_ENV'] == 'production' ? ENV['STRIPE_SECRET_KEY'] : ENV['STRIPE_TEST_SECRET_KEY']
 Stripe.api_version = '2020-03-02'
 
 # --- Helpers ---
 def log_info(message)
-  puts "\n" + message + "\n\n"
+  puts "\n#{message}\n\n"
   message
 end
 
@@ -60,6 +67,7 @@ end
 # ✅ Step 1: Provide connection token
 post '/connection_token' do
   puts ">> /connection_token requested"
+
   if (error = validateApiKey)
     status 400
     return log_info(error)
@@ -67,16 +75,17 @@ post '/connection_token' do
 
   begin
     token = Stripe::Terminal::ConnectionToken.create
+    log_info("✅ Token created: #{token.id}")
     content_type :json
     status 200
     { secret: token.secret }.to_json
   rescue Stripe::StripeError => e
     status 402
-    log_info("ConnectionToken error: #{e.message}")
+    log_info("❌ ConnectionToken error: #{e.message}")
   end
 end
 
-# ✅ Step 2: Create payment intent for in-person card-present payment
+# ✅ Step 2: Create payment intent
 post '/create_payment_intent' do
   puts ">> /create_payment_intent called"
   puts ">>> DEBUG: capture_method = automatic"
@@ -97,19 +106,20 @@ post '/create_payment_intent' do
       receipt_email: params[:receipt_email]
     )
 
-    log_info("PaymentIntent created: #{payment_intent.id}")
+    log_info("✅ PaymentIntent created: #{payment_intent.id}")
     content_type :json
     status 200
     { intent: payment_intent.id, secret: payment_intent.client_secret }.to_json
   rescue Stripe::StripeError => e
     status 402
-    log_info("PaymentIntent creation failed: #{e.message}")
+    log_info("❌ PaymentIntent creation failed: #{e.message}")
   end
 end
 
-# ✅ Capture payment intent (optional if capture_method is manual)
+# ✅ Capture payment intent (if using manual capture)
 post '/capture_payment_intent' do
   puts ">> /capture_payment_intent called"
+
   begin
     id = params["payment_intent_id"]
     payment_intent = if params["amount_to_capture"]
@@ -118,29 +128,30 @@ post '/capture_payment_intent' do
       Stripe::PaymentIntent.capture(id)
     end
 
-    log_info("Captured PaymentIntent: #{id}")
+    log_info("✅ Captured PaymentIntent: #{id}")
     content_type :json
     status 200
     { intent: payment_intent.id, secret: payment_intent.client_secret }.to_json
   rescue Stripe::StripeError => e
     status 402
-    log_info("Capture failed: #{e.message}")
+    log_info("❌ Capture failed: #{e.message}")
   end
 end
 
 # ✅ Cancel payment intent
 post '/cancel_payment_intent' do
   puts ">> /cancel_payment_intent called"
+
   begin
     id = params["payment_intent_id"]
     payment_intent = Stripe::PaymentIntent.cancel(id)
 
-    log_info("Canceled PaymentIntent: #{id}")
+    log_info("✅ Canceled PaymentIntent: #{id}")
     content_type :json
     status 200
     { intent: payment_intent.id, secret: payment_intent.client_secret }.to_json
   rescue Stripe::StripeError => e
     status 402
-    log_info("Cancel failed: #{e.message}")
+    log_info("❌ Cancel failed: #{e.message}")
   end
 end
