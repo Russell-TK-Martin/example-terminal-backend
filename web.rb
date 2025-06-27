@@ -51,9 +51,6 @@ def validateApiKey
   if Stripe.api_key.start_with?('pk')
     return "Error: you used a publishable key. Use your test mode *secret* key."
   end
-  if Stripe.api_key.start_with?('sk_live') && ENV['STRIPE_ENV'] != 'production'
-    return "Error: you're using a live key in test mode. Use your test secret key."
-  end
   nil
 end
 
