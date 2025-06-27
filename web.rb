@@ -36,7 +36,7 @@ puts ">> ENV['STRIPE_SECRET_KEY']: #{ENV['STRIPE_SECRET_KEY'] ? '[loaded]' : '(e
 
 # --- Stripe Setup ---
 Stripe.api_key = ENV['STRIPE_ENV'] == 'production' ? ENV['STRIPE_SECRET_KEY'] : ENV['STRIPE_TEST_SECRET_KEY']
-Stripe.api_version = '2020-03-02'
+
 
 # --- Helpers ---
 def log_info(message)
