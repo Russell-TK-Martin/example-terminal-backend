@@ -35,8 +35,7 @@ puts ">> ENV['STRIPE_TEST_SECRET_KEY']: #{ENV['STRIPE_TEST_SECRET_KEY'] ? '[load
 puts ">> ENV['STRIPE_SECRET_KEY']: #{ENV['STRIPE_SECRET_KEY'] ? '[loaded]' : '(empty)'}"
 
 # --- Stripe Setup ---
-Stripe.api_key = ENV['STRIPE_ENV'] == 'production' ? ENV['STRIPE_SECRET_KEY'] : ENV['STRIPE_TEST_SECRET_KEY']
-
+Stripe.api_key = ENV['STRIPE_SECRET_KEY']
 
 # --- Helpers ---
 def log_info(message)
